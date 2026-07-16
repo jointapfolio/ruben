@@ -44,6 +44,7 @@ const clientData = {
   // --------------------------------------------------------------
   links: [
     { platform: "Instagram", url: "https://www.instagram.com/rubenraj2007?igsh=MnU2a3hjamIyaDA3", icon: "instagram" },
+    { platform: "TikTok", url: "https://www.tiktok.com/@rubenraj2007?_r=1&_t=ZS-984RjGb5xsV", icon: "tiktok" },
     { platform: "WhatsApp", url: "https://wa.me/qr/WNNPT336AEF6A1", icon: "message-circle" },
     { platform: "GitHub", url: "https://github.com/rubenraj2007", icon: "github" }
   ],
