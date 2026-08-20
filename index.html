@@ -347,6 +347,133 @@
     render();
   </script>
 
+  <!-- Interactive Pikachu Cyber-Pet -->
+  <style>
+    #cyber-pet-container {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 40px;
+      height: 40px;
+      z-index: -5; /* Over background, under buttons */
+      pointer-events: none; /* Prevents blocking clicks */
+    }
+    
+    #cyber-pet-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: transform 0.2s ease; /* Smooth flipping animation */
+    }
+
+    .pet-sleeping {
+      /* Visual cue for resting/sleeping */
+      filter: grayscale(80%) brightness(70%);
+    }
+  </style>
+
+  <div id="cyber-pet-container">
+    <!-- Animated Pikachu GIF -->
+    <img id="cyber-pet-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" alt="pikachu cyber pet" />
+  </div>
+
+  <script>
+    function initInteractiveCyberPet() {
+      const container = document.getElementById("cyber-pet-container");
+      const img = document.getElementById("cyber-pet-img");
+
+      // Pet state variables
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+      let petX = window.innerWidth / 2;
+      let petY = window.innerHeight / 2;
+      
+      let isSleeping = false;
+      let lastInteractionTime = Date.now();
+      
+      const speed = 0.05; // How fast it chases the cursor
+      const sleepDelay = 5000; // 5 seconds of inactivity triggers sleep
+      const gravity = 0.08; // Fall speed when sleeping
+      const petSize = 40; // Width/Height of container
+
+      // Listen for mouse and touch interactions
+      function updateMousePos(x, y) {
+        // Offset slightly so the pet tries to catch the tip of the cursor
+        mouseX = x + 10;
+        mouseY = y + 10;
+        lastInteractionTime = Date.now();
+        
+        if (isSleeping) {
+          isSleeping = false;
+          img.classList.remove("pet-sleeping");
+        }
+      }
+
+      window.addEventListener("mousemove", (e) => {
+        updateMousePos(e.clientX, e.clientY);
+      });
+
+      window.addEventListener("touchmove", (e) => {
+        if (e.touches.length > 0) {
+          updateMousePos(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      });
+      window.addEventListener("touchstart", (e) => {
+        if (e.touches.length > 0) {
+          updateMousePos(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      });
+
+      function animate() {
+        const now = Date.now();
+        const timeSinceInteraction = now - lastInteractionTime;
+        
+        // Calculate dynamic bounds to prevent wandering off-screen
+        const maxLeft = window.innerWidth - petSize;
+        const maxTop = window.innerHeight - petSize;
+
+        if (timeSinceInteraction > sleepDelay) {
+          // Fall asleep and drop with gravity
+          if (!isSleeping) {
+            isSleeping = true;
+            img.classList.add("pet-sleeping");
+          }
+          // Simple gravity to the bottom of the screen
+          petY += (maxTop - petY) * gravity;
+        } else {
+          // Chase cursor
+          const dx = mouseX - petX;
+          const dy = mouseY - petY;
+          
+          petX += dx * speed;
+          petY += dy * speed;
+
+          // Flip direction based on X movement
+          if (dx > 2) {
+            img.style.transform = "scaleX(1)";
+          } else if (dx < -2) {
+            img.style.transform = "scaleX(-1)";
+          }
+        }
+
+        // Keep within screen bounds unconditionally
+        petX = Math.max(0, Math.min(petX, maxLeft));
+        petY = Math.max(0, Math.min(petY, maxTop));
+
+        // Apply position via hardware-accelerated transform for maximum performance
+        container.style.transform = `translate(${petX}px, ${petY}px)`;
+
+        // Loop at 60fps
+        requestAnimationFrame(animate);
+      }
+
+      // Start the animation loop
+      requestAnimationFrame(animate);
+    }
+    
+    initInteractiveCyberPet();
+  </script>
+
 </body>
 
 </html>
